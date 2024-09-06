@@ -39,7 +39,7 @@ cart.forEach((cartItem)=>{
                 <span class="update-quantity-link link-primary js-update-link" data-product-id="${matchingProduct.id}">        
                     Update
                 </span>
-                <input type="number" min="1" max="999" class="quantity-input quantity-input-${matchingProduct.id}">
+                <input type="number" min="1" max="999" class="quantity-input quantity-input-${matchingProduct.id}" data-input-id="${matchingProduct.id}">
                 <span class="save-quantity-link link-primary js-save-link" data-save-id="${matchingProduct.id}">
                     Save
                 </span>
@@ -132,38 +132,43 @@ document.querySelectorAll('.js-update-link').forEach((link) =>{
     })
 })
 
+function saveQuantity(saveId){
+    const inputQuantity = Number(document.querySelector(`.quantity-input-${saveId}`).value);
+        
+    if(inputQuantity <= 0 || inputQuantity >= 1000){
+        return alert('Quantity should be between 1 - 999');
+    }
+
+    const containerElement = document.querySelector(`.js-cart-item-container-${saveId}`);
+
+    if(containerElement.classList.contains('is-editing-quantity')){
+        
+        containerElement.classList.remove('is-editing-quantity');
+
+
+    } else {
+
+        containerElement.classList.add('is-editing-quantity');
+
+    }
+
+    updateQuantity(saveId, inputQuantity);
+    
+    document.querySelector(`.quantity-label-${saveId}`).innerHTML = inputQuantity;
+}
+
 document.querySelectorAll('.js-save-link').forEach((link)=>{
     link.addEventListener('click',()=>{
         const {saveId} = link.dataset;
-        const inputQuantity = Number(document.querySelector(`.quantity-input-${saveId}`).value);
-        
-        if(inputQuantity <= 0 || inputQuantity >= 1000){
-            return alert('Quantity should be between 1 - 999');
-        }
-
-        const containerElement = document.querySelector(`.js-cart-item-container-${saveId}`);
-
-        if(containerElement.classList.contains('is-editing-quantity')){
-            
-            containerElement.classList.remove('is-editing-quantity');
-
-
-        } else {
-
-            containerElement.classList.add('is-editing-quantity');
-
-        }
-
-        updateQuantity(saveId, inputQuantity);
-        
-        document.querySelector(`.quantity-label-${saveId}`).innerHTML = inputQuantity;
+        saveQuantity(saveId);
     })
 })
 
 document.querySelectorAll('.quantity-input').forEach((input)=>{
     input.addEventListener('keydown',()=>{
         if(event.key === 'Enter'){
-            console.log(input);
+            const {inputId} = input.dataset;
+            saveQuantity(inputId);
         }
     })
 })
