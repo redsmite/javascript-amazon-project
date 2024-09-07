@@ -1,10 +1,12 @@
-import {cart, removeFromCart, calculateCartQuantity, updateQuantity, updateDeliveryOption} from "../../data/cart.js";
+import {cart, removeFromCart, updateQuantity, updateDeliveryOption} from "../../data/cart.js";
 import {getProduct} from "../../data/products.js"
 import {formatCurrency} from "../utils/money.js";
 import {hello} from 'https://unpkg.com/supersimpledev@1.0.1/hello.esm.js';
 import dayjs from 'https://unpkg.com/dayjs@1.11.10/esm/index.js';
 import {deliveryOptions, getDeliveryOption} from '../../data/deliveryOptions.js';
 import {renderPaymentSummary} from "./paymentSummary.js";
+import {renderCheckoutHeader} from "./checkoutHeader.js";
+import {isWeekend} from '../Exercise/lesson15exercise.js';
 
 export function renderOrderSummary(){
     let cartSummaryHTML = '';
@@ -74,64 +76,14 @@ export function renderOrderSummary(){
         `;
     });
 
-    function deliveryOptionsHTML(matchingProduct, cartItem){
-        let html = '';
-
-        deliveryOptions.forEach((deliveryOption)=>{
-            const today = dayjs();
-            const deliveryDate = today.add(
-                deliveryOption.deliveryDays,
-                'days'
-            );
-
-            const priceString = deliveryOption.priceCents
-            === 0
-                ? 'Free'
-                : `$${formatCurrency(deliveryOption.priceCents)} -`
-
-            const dateString = deliveryDate.format(
-                'dddd, MMMM D'
-            )
-
-            const isChecked = deliveryOption.id === cartItem.deliveryOptionId
-                ? 'checked'
-                : '';
-
-            html += `
-            <div class="delivery-option js-delivery-option" 
-                data-product-id="${matchingProduct.id}"
-                data-delivery-option-id="${deliveryOption.id}">
-                <input type="radio"
-                ${isChecked}
-                class="delivery-option-input"
-                name="delivery-option-${matchingProduct.id}">
-                <div>
-                <div class="delivery-option-date">
-                    ${dateString}
-                </div>
-                <div class="delivery-option-price">
-                    ${priceString} Shipping
-                </div>
-                </div>
-            </div>
-            `
-        })
-
-        return html;
-    }
-
-
     document.querySelector('.js-order-summary').innerHTML = cartSummaryHTML;
 
     document.querySelectorAll('.js-delete-link').forEach((link) =>{
         link.addEventListener('click',()=>{
             const { productId } = link.dataset;
             removeFromCart(productId);
-
-            const container = document.querySelector(`.js-cart-item-container-${productId}`);
-
-            container.remove();
-            calculateCartQuantity();
+            renderOrderSummary();
+            renderCheckoutHeader();
             renderPaymentSummary();
         })
     })
@@ -153,32 +105,6 @@ export function renderOrderSummary(){
             }
         })
     })
-
-    function saveQuantity(saveId){
-        const inputQuantity = Number(document.querySelector(`.quantity-input-${saveId}`).value);
-            
-        if(inputQuantity <= 0 || inputQuantity >= 1000){
-            return alert('Quantity should be between 1 - 999');
-        }
-
-        const containerElement = document.querySelector(`.js-cart-item-container-${saveId}`);
-
-        if(containerElement.classList.contains('is-editing-quantity')){
-            
-            containerElement.classList.remove('is-editing-quantity');
-
-
-        } else {
-
-            containerElement.classList.add('is-editing-quantity');
-
-        }
-
-        updateQuantity(saveId, inputQuantity);
-        renderPaymentSummary();
-        
-        document.querySelector(`.quantity-label-${saveId}`).innerHTML = inputQuantity;
-    }
 
     document.querySelectorAll('.js-save-link').forEach((link)=>{
         link.addEventListener('click',()=>{
@@ -206,5 +132,100 @@ export function renderOrderSummary(){
         });
     });
 
-    calculateCartQuantity();
+    renderCheckoutHeader();
+}
+
+function saveQuantity(saveId){
+    const inputQuantity = Number(document.querySelector(`.quantity-input-${saveId}`).value);
+        
+    if(inputQuantity <= 0 || inputQuantity >= 1000){
+        return alert('Quantity should be between 1 - 999');
+    }
+
+    const containerElement = document.querySelector(`.js-cart-item-container-${saveId}`);
+
+    if(containerElement.classList.contains('is-editing-quantity')){
+        
+        containerElement.classList.remove('is-editing-quantity');
+
+
+    } else {
+
+        containerElement.classList.add('is-editing-quantity');
+
+    }
+
+    updateQuantity(saveId, inputQuantity);
+    renderPaymentSummary();
+    
+    document.querySelector(`.quantity-label-${saveId}`).innerHTML = inputQuantity;
+}
+
+
+function deliveryOptionsHTML(matchingProduct, cartItem){
+    let html = '';
+
+    deliveryOptions.forEach((deliveryOption)=>{
+        const deliveryDate = calculateDeliveryDate(deliveryOption);
+
+        const priceString = deliveryOption.priceCents
+        === 0
+            ? 'Free'
+            : `$${formatCurrency(deliveryOption.priceCents)} -`
+
+        const dateString = deliveryDate.format(
+            'dddd, MMMM D'
+        )
+
+        const isChecked = deliveryOption.id === cartItem.deliveryOptionId
+            ? 'checked'
+            : '';
+
+        html += `
+        <div class="delivery-option js-delivery-option" 
+            data-product-id="${matchingProduct.id}"
+            data-delivery-option-id="${deliveryOption.id}">
+            <input type="radio"
+            ${isChecked}
+            class="delivery-option-input"
+            name="delivery-option-${matchingProduct.id}">
+            <div>
+            <div class="delivery-option-date">
+                ${dateString}
+            </div>
+            <div class="delivery-option-price">
+                ${priceString} Shipping
+            </div>
+            </div>
+        </div>
+        `
+    })
+
+    return html;
+}
+
+function calculateDeliveryDate(deliveryOption){
+    const today = dayjs();
+    const {deliveryDays} = deliveryOption;
+    let daysAdd = 0;
+    
+
+
+    let bufferDate = today;
+    let iteration = 0;
+
+    while (iteration <= deliveryDays){
+        if(isWeekend(bufferDate) === true) {
+            daysAdd++;
+        }else{
+            iteration++;
+        }
+        bufferDate = bufferDate.add(1,'days');
+
+    }
+    console.log(deliveryDays);
+    console.log(daysAdd);
+    const deliveryDate = today.add(deliveryDays + daysAdd,'days');
+
+    return deliveryDate;
 }

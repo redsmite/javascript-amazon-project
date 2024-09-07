@@ -1,5 +1,6 @@
-import { cart, addToCart, calculateCartQuantity } from '../data/cart.js';
+import { addToCart} from '../data/cart.js';
 import { products } from '../data/products.js';
+import { renderCheckoutHeader } from './checkout/checkoutHeader.js';
 import { formatCurrency } from './utils/money.js';
 
 let productsHTML = '';
@@ -61,8 +62,8 @@ document.querySelectorAll('.js-add-to-cart').forEach((button) =>{
     button.addEventListener('click',()=>{
         const productId = button.dataset.productId;
         addToCart(productId);
-        calculateCartQuantity();
+        renderCheckoutHeader();
     })
 });
 
-calculateCartQuantity();
+renderCheckoutHeader();
