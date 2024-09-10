@@ -20,14 +20,9 @@ export function renderOrderSummary(){
 
         const deliveryOption = getDeliveryOption(deliveryOptionId);
 
-        const today = dayjs();
-        const deliveryDate = today.add(
-            deliveryOption.deliveryDays,
-            'days'
-        );
-        const dateString = deliveryDate.format(
+        const dateString = calculateDeliveryDate(deliveryOption).format(
             'dddd, MMMM D'
-        )
+        );
 
         cartSummaryHTML += `
         <div class="cart-item-container js-cart-item-container-${matchingProduct.id}">
@@ -209,7 +204,8 @@ function calculateDeliveryDate(deliveryOption){
     const {deliveryDays} = deliveryOption;
     let daysAdd = 0;
     
-
+    const isTodayWeekend = isWeekend(today);
+    isTodayWeekend === true ? daysAdd -- : '';
 
     let bufferDate = today;
     let iteration = 0;
@@ -223,8 +219,7 @@ function calculateDeliveryDate(deliveryOption){
         bufferDate = bufferDate.add(1,'days');
 
     }
-    console.log(deliveryDays);
-    console.log(daysAdd);
+    
     const deliveryDate = today.add(deliveryDays + daysAdd,'days');
 
     return deliveryDate;
