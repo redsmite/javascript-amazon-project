@@ -28,14 +28,14 @@ describe('test suite addToCart', ()=>{
         deliveryOptionId : 1
       }]);
     });
-      loadFromStorage();
+    loadFromStorage();
 
-      addToCart(productid);
-      expect(cart.length).toEqual(1);
-      expect(localStorage.setItem).toHaveBeenCalledTimes(1);
-      expect(cart[0].productId).toEqual(productid);
-      expect(cart[0].quantity).toEqual(2);
-    });
+    addToCart(productid);
+    expect(cart.length).toEqual(1);
+    expect(localStorage.setItem).toHaveBeenCalledTimes(1);
+    expect(cart[0].productId).toEqual(productid);
+    expect(cart[0].quantity).toEqual(2);
+  });
 
   it('adds a new product to the cart', ()=>{
     spyOn(localStorage, 'setItem');
