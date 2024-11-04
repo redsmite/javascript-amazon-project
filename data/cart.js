@@ -44,7 +44,7 @@ export function addToCart(productId){
         cart.push({
             productId,
             quantity: selectorQuantity,
-            deliveryOptionId: '1'
+            deliveryOptionId: 1
         })
     }
 

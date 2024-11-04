@@ -17,3 +17,7 @@ formatCurrency(2000.5) === '20.01' ? console.log('passed') : console.log('failed
 console.log('rounds up to the nearest cents 2nd case');
 
 formatCurrency(2000.4) === '20.00' ? console.log('passed') : console.log('failed');
+
+console.log('works with negative number');
+
+formatCurrency(-200) === '-2.00' ? console.log('passed') : console.log('failed');
