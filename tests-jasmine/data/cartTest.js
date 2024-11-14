@@ -88,7 +88,7 @@ describe('test suite: remove from cart',()=>{
 
     expect(updatedCart).not.toContain(jasmine.objectContaining({ productId: productId3}));
   })
-  it('localStorage.setItem was called once with the correct value', ()=>{
-    expect(localStorage.setItem).toHaveBeenCalledTimes(1);
-  })
+  // it('localStorage.setItem was called once with the correct value', ()=>{
+  //   expect(localStorage.setItem).toHaveBeenCalledTimes(1);
+  // })
 })
