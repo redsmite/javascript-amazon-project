@@ -204,7 +204,7 @@ function deliveryOptionsHTML(matchingProduct, cartItem){
 
 function calculateDeliveryDate(deliveryOption){
     const today = dayjs();
-    const {deliveryDays} = deliveryOption;
+    const {deliveryDays} = deliveryOption || {};
     let daysAdd = 0;
     
     const isTodayWeekend = isWeekend(today);
