@@ -124,7 +124,7 @@ export function renderOrderSummary(){
         element.addEventListener('click',()=>{
             const {productId} = element.dataset;
             const {deliveryOptionId} = element.dataset;
-            updateDeliveryOption(productId, deliveryOptionId);
+            cart.updateDeliveryOption(productId, deliveryOptionId);
             renderOrderSummary();
             renderPaymentSummary();
         });
@@ -153,7 +153,8 @@ function saveQuantity(saveId){
 
     }
 
-    updateQuantity(saveId, inputQuantity);
+    cart.updateQuantity(saveId, inputQuantity);
+    renderOrderSummary();
     renderPaymentSummary();
     
     document.querySelector(`.quantity-label-${saveId}`).innerHTML = inputQuantity;
